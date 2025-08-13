@@ -20,7 +20,7 @@ This Arduino sketch connects a drone’s onboard **Myosa sensor suite** to Wi-Fi
 
 ---
 
-## 🛠 Requirements
+##  Requirements
 
 - **Arduino IDE 2.x** (or 1.8.x)
 - **Board:** ESP32 (WiFi capable)
@@ -31,7 +31,7 @@ This Arduino sketch connects a drone’s onboard **Myosa sensor suite** to Wi-Fi
 
 ---
 
-## 📥 Installing Myosa Libraries
+## Installing Myosa Libraries
 
 ### Option 1 — From Myosa GitHub
 1. Download the Myosa libraries from:  
@@ -45,7 +45,7 @@ Follow the official guide here:
 
 ---
 
-## 🚀 Setup & Usage
+## Setup & Usage
 
 1. **Open the Sketch**  
    Open `mastercode.ino` in Arduino IDE.
@@ -72,7 +72,7 @@ Follow the official guide here:
 
 ---
 
-## 📡 How It Works
+## How It Works
 
 1. **Initialization** (`setup()`):
 
@@ -110,21 +110,42 @@ Follow the official guide here:
 
 ---
 
-## 🔒 Security
+## Security
 
 * **TLS with Root CA Pinning** — prevents MITM attacks by ensuring connection only to trusted server.
 * No plaintext credentials are sent after connection is established.
 
 ---
 
-## ⚠ Potential Improvements
+##  Potential Improvements
 
-* **Non-blocking Wi-Fi reconnect** — currently only checks before sending; could add automatic reconnection logic.
-* **Dynamic interval configuration** — make `perModuleInterval` adjustable without recompiling.
-* **Async HTTP requests** — use an asynchronous client to avoid blocking loop execution during transmission.
-* **Error handling for sensors** — currently assumes all sensor reads succeed; could add fallback/default values.
-* **Compression** — compress JSON payload before sending for bandwidth efficiency.
-* **Config file** — move Wi-Fi credentials, server URL, and drone ID into a separate config file for easier updates.
+### Switch to MQTT over TLS
+Instead of sending JSON via HTTP, use MQTT for lightweight, low-latency, and reliable telemetry.
+
+- **Broker:** `mqtts://broker.lunadrone.com:8883`
+- Use **TLS 1.2** with CA certificate pinning, or even **mutual TLS** (client certificate + server certificate) for strong authentication.
+- Retained messages for last known status.
+- QoS 1 or 2 for guaranteed delivery.
+
+### Non-blocking Wi-Fi reconnect
+Automatically detect disconnection and reconnect without blocking sensor loops.
+
+### Async communication
+Use libraries like `AsyncMqttClient` or `ESPAsyncTCP` to avoid blocking during network I/O.
+
+### Dynamic interval configuration
+Allow changing `perModuleInterval` remotely via MQTT topic  
+(e.g., `lunadrone/LNDR-001/config/interval`).
+
+### Encrypted config storage
+Store Wi-Fi credentials and keys securely in ESP32 NVS with encryption enabled.
+
+### Failover to LoRa / 4G
+If Wi-Fi is unavailable, fall back to cellular or LoRa for data relay.
+
+### OTA updates
+Secure over-the-air firmware updates using signed binaries.
+
 
 ---
 
@@ -133,3 +154,6 @@ Follow the official guide here:
 MIT License — feel free to modify and use.
 
 ---
+
+
+
